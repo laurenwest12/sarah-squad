@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
+import Popup from 'reactjs-popup';
 
 import Brandon from './images/Brandon.jpg';
 import Lauren from './images/Lauren.jpg';
@@ -19,6 +20,7 @@ class App extends Component {
     this.state = {
       added: [],
       options: shuffle(options),
+      error: '',
     };
   }
 
@@ -27,14 +29,18 @@ class App extends Component {
     const { image } = this.state.options.find((item) => item.name === name);
     const added = this.state.added.slice();
 
-    const isAlreadyAdded =
-      added.filter((item) => item.name === name).length === 1;
+    if (this.state.added.length < 2) {
+      const isAlreadyAdded =
+        added.filter((item) => item.name === name).length === 1;
 
-    !isAlreadyAdded && added.push({ name, image });
+      !isAlreadyAdded && added.push({ name, image });
 
-    const options = this.state.options.filter((item) => item.name !== name);
+      const options = this.state.options.filter((item) => item.name !== name);
 
-    this.setState({ added, options });
+      this.setState({ added, options });
+    } else {
+      this.setState({ error: 'Full chat' });
+    }
   };
 
   handleRemove = ({ target }) => {
@@ -47,12 +53,19 @@ class App extends Component {
     const added = this.state.added.filter((item) => item.name !== name);
 
     this.setState({ added, options });
+
+    if (this.state.added.length <= 2) {
+      this.setState({ error: '' });
+    }
   };
 
   render() {
     return (
       <div className="App">
         <h1>Chat</h1>
+        <Popup open={this.state.error}>
+          <div>Chat is full!</div>
+        </Popup>
         <div className="added">
           {this.state.added.map(({ name, image }) => (
             <div key={name} className="cast">
